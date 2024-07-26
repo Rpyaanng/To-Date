@@ -1,0 +1,39 @@
+
+.task-disable {
+  animation : dim 0.2s linear forwards; 
+}
+
+.task-strike{
+  position: relative;
+}
+
+.task-strike:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 1px;
+  background: black;
+  animation: strike 0.2s linear forwards;
+}
+
+@keyframes strike {
+  from {
+    width: 0;
+    color: rgb(148 163 184);
+  }
+  to {
+    width: 100%;
+    color: rgb(148 163 184);
+  }
+}
+
+@keyframes dim {
+  from {
+    
+  }
+  to {
+    color: rgb(148 163 184);
+  }
+
+}

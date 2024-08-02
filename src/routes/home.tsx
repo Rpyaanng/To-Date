@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-ref = { hourRef }
 import { Outlet, Navigate } from '@tanstack/react-router'
 import { TaskComponent } from "@/components/TaskComponent"
 import {
@@ -14,6 +13,8 @@ import { IconInput } from '@/components/ui/iconinput'
 import { Progress } from '@/components/ui/progress'
 import { TaskStore, DateStore, Task, SubTask } from "@/store/store"
 import { ChevronRight, ChevronLeft, PlusIcon } from 'lucide-react'
+import { useEffect } from 'react'
+import { TimeLineView } from '@/components/TimelineView'
 
 export const Route = createFileRoute('/home')({
   component: Home,
@@ -34,8 +35,8 @@ function Home() {
   const debugTask: Task = {
     id: "cCa",
     title: "Hello World",
-    startTime: new Date(),
-    endTime: new Date(),
+    startTime: new Date().toISOString(),
+    endTime: new Date().toISOString(),
     subtasks: [subTaskA],
     completed: false,
   }
@@ -64,6 +65,8 @@ function Home() {
     console.log(currentDate);
   }
 
+
+
   return (
     <div className="h-screen">
       <ResizablePanelGroup direction="horizontal">
@@ -88,6 +91,7 @@ function Home() {
                 {tasks.get(currentDate)?.map((t, i) => {
                   return <TaskComponent key={"t-" + t.id + "_" + i} {...{ task: t }} />
                 })}
+                <TimeLineView />
               </div>
               <form onSubmit={onTaskAdd}>
                 <IconInput id="newTitle" type="text" Icon={PlusIcon} placeholder='Type here to add a task' />

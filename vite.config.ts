@@ -6,8 +6,8 @@ import { defineConfig } from "vite"
 export default defineConfig({
   plugins: [react(), TanStackRouterVite(),],
   server: {
+    host: true,
     watch: {
-      usePolling: true,
     }
   },
   resolve: {

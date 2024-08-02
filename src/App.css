@@ -17,6 +17,14 @@
   animation: strike 0.2s linear forwards;
 }
 
+.dot {
+ height: 25px;
+  width: 25px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+
 @keyframes strike {
   from {
     width: 0;

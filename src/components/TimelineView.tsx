@@ -1,9 +1,9 @@
 
+import { useEffect } from "react";
 import { Task } from "../store/store"
-import { Checkbox } from "@/components/ui/checkbox"
 import { TaskStore, DateStore } from "@/store/store"
-import { Link } from '@tanstack/react-router'
-
+import { TaskComponent } from "./TaskComponent";
+import { DateToTimeDisplay } from "@/lib/utils";
 
 interface TimeSlot {
   startTime: string,
@@ -21,19 +21,32 @@ interface Props {
   timeSlots: TimeSlot[];
 };
 
-export function TimeLineView({ unsortedTasks, timeSlots }: TimeLineData) {
-  const currentDate = DateStore((state) => state.currentDate);
-  const toggleTodo = TaskStore((state) => state.toggleTodo);
-  const getSubCompleted = TaskStore((state) => state.getSubCompleted);
 
+export function TimeLineView({ unsortedTasks, timeSlots }: TimeLineData) {
+  console.log(timeSlots)
   return (
-    <div className="flex">
-      <div className="w-full flex flex-col">
-        <span className="dot"></span>
-        <span className="dot"></span>
-      </div>
-      <div className="items-center w-full">
-      </div>
+    <div className="w-full">
+      <h2 className="2xl font-bold">Timeline</h2>
+      {timeSlots.map((timeslot: TimeSlot, i) => {
+        return (
+          <div key={"v_" + i} className="grid grid-cols-[2rem_auto]">
+            <div className="grid grid-rows-[1rem_auto_1rem] justify-items-center m-[0.25rem]">
+              <span className="dot"></span>
+              <div className="line"></div>
+              <span className="dot"></span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="w-full text-center">{DateToTimeDisplay(timeslot.startTime)}</span>
+              {timeslot.tasks.map((task, y) => {
+                return (
+                  <TaskComponent key={"vt_" + y} task={task} />
+                )
+              })}
+              <span className="w-full text-center">{DateToTimeDisplay(timeslot.endTime)}</span>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

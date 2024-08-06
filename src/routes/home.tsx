@@ -15,6 +15,7 @@ import { TaskStore, DateStore, Task, SubTask } from "@/store/store"
 import { ChevronRight, ChevronLeft, PlusIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { TimeLineView } from '@/components/TimelineView'
+import { orderTasksByTime } from "@/lib/utils";
 
 export const Route = createFileRoute('/home')({
   component: Home,
@@ -65,7 +66,7 @@ function Home() {
     console.log(currentDate);
   }
 
-
+  const orderedTasks = orderTasksByTime(tasks.get(currentDate));
 
   return (
     <div className="h-screen">
@@ -91,7 +92,7 @@ function Home() {
                 {tasks.get(currentDate)?.map((t, i) => {
                   return <TaskComponent key={"t-" + t.id + "_" + i} {...{ task: t }} />
                 })}
-                <TimeLineView />
+                <TimeLineView {...orderedTasks} />
               </div>
               <form onSubmit={onTaskAdd}>
                 <IconInput id="newTitle" type="text" Icon={PlusIcon} placeholder='Type here to add a task' />

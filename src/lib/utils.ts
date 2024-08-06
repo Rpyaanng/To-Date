@@ -2,19 +2,19 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Task } from "@/store/store"
 
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-
-const months = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "Novemeber", "December"]
-
 export function DateToDisplay(ISOString: string) {
+  const months = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "Novemeber", "December"]
   const newDate = new Date(ISOString)
   return months[newDate.getMonth()] + " " + newDate.getDate();
 }
 
+export function DateToTimeDisplay(ISOString: string) {
+  return new Date(ISOString).toLocaleTimeString().replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3")
+}
 
 export function OffsetDate(date: Date, offset: number) {
   const newDateMillis: number = new Date(date).getTime();
@@ -35,7 +35,7 @@ export function orderTasksByTime(unsortedTasks: Task[]) {
     timeSlots: new Array<TimeSlot>()
   };
 
-  if (!unsortedTasks) return
+  if (!unsortedTasks) return sortedTasks;
 
   // go through all tasks
   for (let i = 0; i < unsortedTasks.length; i++) {

@@ -71,9 +71,9 @@ function Home() {
   return (
     <div className="h-screen">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel id='panel-2'>
-          <div className='flex flex-col'>
-            <div className="justify-center py-3 px-2 border-y flex justify-items-center flex-col mb-2">
+        <ResizablePanel id='panel-2' className='h-[100vh]'>
+          <div className='flex flex-col '>
+            <div className="justify-center py-3 px-2 border-y flex justify-items-center flex-col mb-2 h-[18vh]">
               <div className='flex w-full justify-between mb-6'>
                 <Button variant='outline'><ChevronLeft /></Button>
                 <h1 className="font-bold text-5xl text-center">{DateToDisplay(currentDate)}</h1>
@@ -82,21 +82,15 @@ function Home() {
               <Progress value={(GetCompleted(currentDate) / tasks.get(currentDate)?.length) * 100.0} />
               <span className='text-slate-400 text-center'>{GetCompleted(currentDate)} / {tasks.get(currentDate)?.length} Tasks Complete</span>
             </div>
-            <div className="justify-center my-3 mx-2 flex justify-items-center flex-col" >
-              <div className="grid grid-cols-6 gap-2 mb-2">
-                <Button onClick={() => debugAddTask()}>Add debug task</Button>
-                <Button onClick={() => debugLogTask()}>Log Tasks</Button>
+            <div className='h-[82vh] overflow-auto'>
+              <div className="justify-center flex justify-items-center flex-col" >
+                <div className="flex flex-col gap-2 mb-2 m-2">
+                  <TimeLineView {...orderedTasks} />
+                </div>
+                <form className="relative sticky bottom-6 bg-white mb-4 mx-2 mt-2" onSubmit={onTaskAdd}>
+                  <IconInput id="newTitle" type="text" Icon={PlusIcon} placeholder='Type here to add a task' />
+                </form>
               </div>
-              <p className='pb-2 font-bold'>To-do</p>
-              <div className="flex flex-col gap-2 mb-2">
-                {tasks.get(currentDate)?.map((t, i) => {
-                  return <TaskComponent key={"t-" + t.id + "_" + i} {...{ task: t }} />
-                })}
-                <TimeLineView {...orderedTasks} />
-              </div>
-              <form onSubmit={onTaskAdd}>
-                <IconInput id="newTitle" type="text" Icon={PlusIcon} placeholder='Type here to add a task' />
-              </form>
             </div>
           </div>
         </ResizablePanel>

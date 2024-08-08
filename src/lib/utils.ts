@@ -45,43 +45,38 @@ export function orderTasksByTime(unsortedTasks: Task[]) {
     if (!task) {
       continue
     }
-    // if task has no start or end time add to unsorted
-    //if (!task.startTime && !task.endTime) {
-    //  sortedTasks.unsortedTasks.push(task)
-    //}
-
 
     // If task has a start time and end time
     if (task.startTime && task.endTime) {
       // check to see if it fits within an existing time slot
-      let hasIntersection = false;
-      for (let i = 0; i < sortedTasks.timeSlots.length; i++) {
-        hasIntersection = false;
-        const taskStart = new Date(task.startTime).getTime()
-        const taskEnd = new Date(task.endTime).getTime()
-        const timeStart = new Date(sortedTasks.timeSlots.at(i).startTime).getTime()
-        const timeEnd = new Date(sortedTasks.timeSlots.at(i).endTime).getTime()
-        if (timeEnd >= taskStart && timeStart <= taskEnd) {
-          console.log("1")
-          hasIntersection = true
+      let intersectionList = [];
+      const newTimeSlot = {
+        startTime: task.startTime,
+        endTime: task.endTime,
+        tasks: [task]
+      }
+      for (let j = 0; j < sortedTasks.timeSlots.length; j++) {
+        const newTimeSlotStart = new Date(newTimeSlot.startTime).getTime()
+        const newTimeSlotEnd = new Date(newTimeSlot.endTime).getTime()
+        const timeStart = new Date(sortedTasks.timeSlots.at(j).startTime).getTime()
+        const timeEnd = new Date(sortedTasks.timeSlots.at(j).endTime).getTime()
+        if (timeEnd >= newTimeSlotStart && timeStart <= newTimeSlotEnd) {
           //intersection
-          if (taskStart < timeStart) {
-            sortedTasks.timeSlots.at(i).startTime = task.startTime
+          intersectionList.push(j);
+          if (newTimeSlotStart < timeStart) {
+            newTimeSlot.startTime = task.startTime
           }
-          if (taskEnd > timeEnd) {
-            sortedTasks.timeSlots.at(i).endTime = task.endTime
+          if (newTimeSlotEnd > timeEnd) {
+            newTimeSlot.endTime = task.endTime
           }
-          sortedTasks.timeSlots.at(i).tasks.push(task)
+          newTimeSlot.tasks = sortedTasks.timeSlots.at(j).tasks.concat(newTimeSlot.tasks).sort((t1, t2) => { return new Date(t1.startTime).getTime() - new Date(t2.startTime).getTime() })
         }
       }
-      if (!hasIntersection) {
-
-        sortedTasks.timeSlots.push({
-          startTime: task.startTime,
-          endTime: task.endTime,
-          tasks: [task]
-        })
+      for (let j = intersectionList.length; j > 0; j--) {
+        console.log("removing task")
+        sortedTasks.timeSlots = sortedTasks.timeSlots.splice(j, 1);
       }
+      sortedTasks.timeSlots.push(newTimeSlot)
     } else {
       // If task has a end time the slot it in the latest time slot that is available
       sortedTasks.unsortedTasks.push(task)

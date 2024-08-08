@@ -27,7 +27,7 @@ export function TaskComponent(props: Props) {
           </h2>
           {props.task.subtasks.length > 0 &&
             <div>
-              <p className="text-slate-400">
+              <p className="text-secondary-foreground">
                 {getSubCompleted(currentDate, props.task)}/{props.task.subtasks.length}  {props.task.subtasks.length > 1 ? "subtasks" : "subtask"} completed
               </p>
             </div>

@@ -31,6 +31,7 @@ interface TaskStore {
   getSubCompleted: (dateISO: string, task: Task) => number,
   addTask: (dateISO: string, task: Task) => void,
   addSubTask: (dateISO: string, task: Task, sub: SubTask) => void,
+  removeTask: (dateISO: string, task: Task) => void,
   toggleTodo: (dateISO: string, task: Task) => void,
   toggleSubTodo: (dateISO: string, task: Task, subtask: SubTask) => void,
   setTaskTitle: (dateISO: string, task: Task, title: string) => void,
@@ -75,6 +76,7 @@ const TaskStorage: PersistStorage<TaskStore> = {
       },
     }
   },
+
   setItem: (name, newValue: StorageValue<TaskStore>) => {
     // functions cannot be JSON encoded
     const str = JSON.stringify({
@@ -100,6 +102,14 @@ const TaskStore = create<TaskStore>()(
             const tasks = newMap.get(dateISO);
             if (tasks) return { tasks: newMap.set(dateISO, [...tasks, task]) }
             else return { tasks: newMap.set(dateISO, [task]) }
+          })
+        },
+        removeTask: (dateISO: string, task: Task) => {
+          set((prev) => {
+            const newMap = new Map(prev.tasks);
+            const tasks = newMap.get(dateISO);
+            if (tasks) return { tasks: newMap.set(dateISO, tasks.filter((t) => t.id !== task.id)) }
+            else return newMap
           })
         },
         getCompleted: (dateISO: string) => {
@@ -130,15 +140,8 @@ const TaskStore = create<TaskStore>()(
           })
           return count;
         },
-        removeTask: (dateISO: string, task: Task) => {
-          set((prev) => {
-            const newMap = new Map(prev.tasks);
-            const tasks = newMap.get(dateISO);
-            if (tasks) return { tasks: newMap.set(dateISO, tasks.filter((t) => t.id !== task.id)) }
-            else return newMap
-          })
-        },
         addSubTask: (dateISO: string, task: Task, subtask: SubTask) => set((state) => { state.tasks.get(dateISO)?.filter((t) => t.id == task.id)[0].subtasks.push(subtask) }),
+        removeSubTask: (dateISO: string, task: Task, subtask: SubTask) => set((state) => { state.tasks.get(dateISO)?.filter((t) => t.id == task.id)[0].subtasks.filter((s) => s.id != subtask.id) }),
         setTaskTitle: (dateISO: string, task: Task, title: string) => set((state) => {
           const tIndex = state.tasks.get(dateISO)?.findIndex((t) => t.id == task.id)
           state.tasks.get(dateISO).at(tIndex).title = title

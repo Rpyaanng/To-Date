@@ -17,9 +17,15 @@
   animation: strike 0.2s linear forwards;
 }
 
+.dotted-line{
+ border: 1px dashed theme(colors.slate.300); 
+ height: 3rem;
+ width: 1px;
+}
+
 .dot {
- height: 1rem;
-  width: 1rem;
+ height: 0.75rem;
+  width: 0.75rem;
   background-color: white;
   border: 1px solid theme(colors.slate.500);
   border-radius: 50%;

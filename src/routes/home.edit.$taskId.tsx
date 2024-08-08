@@ -81,7 +81,10 @@ function HomeEdit() {
       </div>
       <div className="flex flex-col px-2 py-2 gap-2">
         <div>
-          <Checkbox onCheckedChange={() => toggleTodo(currentDate, task)} checked={task?.completed} />
+          <div>
+            <Checkbox className='mr-2' onCheckedChange={() => toggleTodo(currentDate, task)} checked={task?.completed} />
+            <span className='text-secondary-foreground'>Check to complete</span>
+          </div>
           <h2 className="font-bold">Task Name</h2>
           <form onSubmit={onTitleChange}>
             <Input id="title" defaultValue={task.title} type='text' />
@@ -91,7 +94,7 @@ function HomeEdit() {
           <div className="gap-2">
             <h2 className='font-bold'>Start Time</h2>
             <form onChange={onStartTimeChange}>
-              <Input id="startTime" type="time" placeholder='Enter a time' className='w-full' value={new Date(task.startTime).getHours().toString().padStart(2, '0') + ":" + new Date(task.startTime).getMinutes().toString().padStart(2, '0')} />
+              <Input id="startTime" type="time" placeholder='Enter a time' className='w-full' value={task.startTime ? new Date(task.startTime).getHours().toString().padStart(2, '0') + ":" + new Date(task.startTime).getMinutes().toString().padStart(2, '0') : ""} />
             </form>
           </div>
         }
@@ -99,7 +102,7 @@ function HomeEdit() {
           <div className="gap-2">
             <h2 className='font-bold'>End Time</h2>
             <form onChange={onEndTimeChange}>
-              <Input id="startTime" type="time" placeholder='End of Day' className='w-full' value={new Date(task.endTime).getHours().toString().padStart(2, '0') + ":" + new Date(task.endTime).getMinutes().toString().padStart(2, '0')} />
+              <Input id="startTime" type="time" placeholder='End of Day' className='w-full' value={task.endTime ? new Date(task.endTime).getHours().toString().padStart(2, '0') + ":" + new Date(task.endTime).getMinutes().toString().padStart(2, '0') : ""} />
             </form>
           </div>
         }

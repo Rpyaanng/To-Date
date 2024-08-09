@@ -8,6 +8,7 @@ import { DateStore, TaskStore, Subtask, Task } from '@/store/store'
 import { ResizablePanel } from '@/components/ui/resizable'
 import { Archive, Trash2, X } from 'lucide-react'
 import { PlusIcon } from 'lucide-react'
+import { DateToTimeDisplay } from '@/lib/utils'
 import { Label } from '@/components/ui/label'
 import { useState, useEffect, useRef } from 'react'
 import { generateUniqueID } from '@/lib/utils'
@@ -25,6 +26,7 @@ function HomeEdit() {
   const getSubCompleted = TaskStore((state) => state.getSubCompleted)
   const setTaskStartTime = TaskStore((state) => state.setTaskStartTime)
   const setTaskEndTime = TaskStore((state) => state.setTaskEndTime)
+  const removeTask = TaskStore((state) => state.removeTask)
   const [subIdx, setSubIdx] = useState(-1)
   const { taskId } = useParams({ strict: false })
   const currentDate = DateStore((state) => state.currentDate);
@@ -73,7 +75,7 @@ function HomeEdit() {
       <div className=" py-2 px-2 border-y flex gap-2 justify-between">
         <div className='flex gap-2'>
           <Archive />
-          <Trash2 />
+          <Trash2 onClick={() => removeTask(currentDate, task)} />
         </div>
         <div className='flex gap-2'>
           <Link to="/home" className='w-full'><X /></Link>
@@ -83,7 +85,7 @@ function HomeEdit() {
         <div>
           <div>
             <Checkbox className='mr-2' onCheckedChange={() => toggleTodo(currentDate, task)} checked={task?.completed} />
-            <span className='text-secondary-foreground'>Check to complete</span>
+            <span className='text-secondary-foreground'>{task.completedOn ? "Completed on " + DateToTimeDisplay(task.completedOn) : "Check to complete"}</span>
           </div>
           <h2 className="font-bold">Task Name</h2>
           <form onSubmit={onTitleChange}>

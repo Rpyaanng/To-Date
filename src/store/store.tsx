@@ -13,6 +13,7 @@ interface SubTask {
 interface Task {
   id: string,
   completed: boolean,
+  completedOn: string | null,
   title: string,
   startTime: string | null,
   endTime: string | null,
@@ -179,6 +180,13 @@ const TaskStore = create<TaskStore>()(
             console.log(tIndex, task.id)
             const newMap = new Map(prev.tasks);
             if (tIndex != -1) {
+              const completion = !newMap.get(dateISO).at(tIndex).completed
+              if (completion) {
+                newMap.get(dateISO).at(tIndex).completedOn = new Date().toISOString()
+              }
+              else {
+                newMap.get(dateISO).at(tIndex).completedOn = null
+              }
               newMap.get(dateISO).at(tIndex).completed = !newMap.get(dateISO).at(tIndex).completed
             }
           }),

@@ -8,12 +8,10 @@ import {
 } from "@/components/ui/resizable"
 import { DateToDisplay, generateUniqueID } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { IconInput } from '@/components/ui/iconinput'
 import { Progress } from '@/components/ui/progress'
 import { TaskStore, DateStore, Task, SubTask } from "@/store/store"
 import { ChevronRight, ChevronLeft, PlusIcon } from 'lucide-react'
-import { useEffect } from 'react'
 import { TimeLineView } from '@/components/TimelineView'
 import { orderTasksByTime } from "@/lib/utils";
 
@@ -28,20 +26,6 @@ function Home() {
   const GetCompleted = TaskStore((state) => state.getCompleted);
   const AddTask = TaskStore((state) => state.addTask)
 
-  const subTaskA: SubTask = {
-    title: "Hello World 1",
-    completed: false,
-    id: "bBb"
-  }
-  const debugTask: Task = {
-    id: "cCa",
-    title: "Hello World",
-    startTime: new Date().toISOString(),
-    endTime: new Date().toISOString(),
-    subtasks: [subTaskA],
-    completed: false,
-  }
-
   const onTaskAdd = (e: React.FormEvent<HTMLInputElement>) => {
     e.preventDefault();
     const newTask: Task = {
@@ -54,16 +38,6 @@ function Home() {
     }
     AddTask(currentDate, newTask)
     e.target.elements.newTitle.value = "";
-  }
-
-  const debugAddTask = () => {
-    AddTask(currentDate, debugTask);
-  }
-
-  const debugLogTask = () => {
-    console.log(tasks);
-    console.log(tasks.has(currentDate));
-    console.log(currentDate);
   }
 
   const orderedTasks = orderTasksByTime(tasks.get(currentDate));

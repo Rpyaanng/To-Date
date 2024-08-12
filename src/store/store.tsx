@@ -6,12 +6,14 @@ enableMapSet();
 
 interface SubTask {
   id: string,
+  order: number,
   title: string,
   completed: boolean,
 }
 
 interface Task {
   id: string,
+  order: number | null,
   completed: boolean,
   completedOn: string | null,
   title: string,
@@ -25,7 +27,6 @@ interface PanelStore {
   setThirdOpen: (arg0: boolean) => void
 }
 
-
 interface TaskStore {
   tasks: Map<string, Task[]>,
   getCompleted: (dateISO: string) => number,
@@ -35,6 +36,7 @@ interface TaskStore {
   removeTask: (dateISO: string, task: Task) => void,
   toggleTodo: (dateISO: string, task: Task) => void,
   toggleSubTodo: (dateISO: string, task: Task, subtask: SubTask) => void,
+  setTaskOrder: (dateISO: string, task: Task, order: number) => void,
   setTaskTitle: (dateISO: string, task: Task, title: string) => void,
   setTaskStartTime: (dateISO: string, task: Task, time: string) => void,
   setTaskEndTime: (dateISO: string, task: Task, time: string) => void,
@@ -44,7 +46,6 @@ interface DateStore {
   currentDate: string,
   setCurrentDate: (date: Date) => void
 }
-
 
 const getStartofDate = (date: Date) => {
   date.setHours(0, 0, 0, 0)
@@ -141,67 +142,75 @@ const TaskStore = create<TaskStore>()(
           })
           return count;
         },
+
         addSubTask: (dateISO: string, task: Task, subtask: SubTask) => set((state) => { state.tasks.get(dateISO)?.filter((t) => t.id == task.id)[0].subtasks.push(subtask) }),
+
         removeSubTask: (dateISO: string, task: Task, subtask: SubTask) => set((state) => { state.tasks.get(dateISO)?.filter((t) => t.id == task.id)[0].subtasks.filter((s) => s.id != subtask.id) }),
+
         setTaskTitle: (dateISO: string, task: Task, title: string) => set((state) => {
           const tIndex = state.tasks.get(dateISO)?.findIndex((t) => t.id == task.id)
-          state.tasks.get(dateISO).at(tIndex).title = title
+          state.tasks.get(dateISO).at(tIndex).title = title;
         }),
-        setTaskStartTime: (dateISO: string, task: Task, time: string) =>
-          set((prev) => {
-            const dateTasks = prev.tasks.get(dateISO)
-            if (!dateTasks) return
-            const tIndex = dateTasks.findIndex((t) => t.id == task.id)
-            if (tIndex == -1) return;
-            const newMap = new Map(prev.tasks);
-            const dayStart = new Date(dateISO);
-            const hourMin = time.split(":");
-            dayStart.setHours(Number(hourMin[0]))
-            dayStart.setMinutes(Number(hourMin[1]))
-            newMap.get(dateISO).at(tIndex).startTime = dayStart.toISOString()
-          }),
-        setTaskEndTime: (dateISO: string, task: Task, time: string) =>
-          set((prev) => {
-            const dateTasks = prev.tasks.get(dateISO)
-            if (!dateTasks) return
-            const tIndex = dateTasks.findIndex((t) => t.id == task.id)
-            if (tIndex == -1) return;
-            const newMap = new Map(prev.tasks);
-            const dayStart = new Date(dateISO);
-            const hourMin = time.split(":");
-            dayStart.setHours(Number(hourMin[0]))
-            dayStart.setMinutes(Number(hourMin[1]))
-            newMap.get(dateISO).at(tIndex).endTime = dayStart.toISOString()
-          }),
-        toggleTodo: (dateISO: string, task: Task) =>
-          set((prev) => {
-            const dateTasks = prev.tasks.get(dateISO)
-            const tIndex = dateTasks?.findIndex((t) => t.id == task.id)
-            console.log(tIndex, task.id)
-            const newMap = new Map(prev.tasks);
-            if (tIndex != -1) {
-              const completion = !newMap.get(dateISO).at(tIndex).completed
-              if (completion) {
-                newMap.get(dateISO).at(tIndex).completedOn = new Date().toISOString()
-              }
-              else {
-                newMap.get(dateISO).at(tIndex).completedOn = null
-              }
-              newMap.get(dateISO).at(tIndex).completed = !newMap.get(dateISO).at(tIndex).completed
+
+        setTaskOrder: (dateISO: string, task: Task, order: number) => set((state) => {
+          const tIndex = state.tasks.get(dateISO)?.findIndex((t) => t.id == task.id)
+          state.tasks.get(dateISO).at(tIndex).order = order;
+        }),
+
+        setTaskStartTime: (dateISO: string, task: Task, time: string) => set((prev) => {
+          const dateTasks = prev.tasks.get(dateISO)
+          if (!dateTasks) return
+          const tIndex = dateTasks.findIndex((t) => t.id == task.id)
+          if (tIndex == -1) return;
+          const newMap = new Map(prev.tasks);
+          const dayStart = new Date(dateISO);
+          const hourMin = time.split(":");
+          dayStart.setHours(Number(hourMin[0]))
+          dayStart.setMinutes(Number(hourMin[1]))
+          newMap.get(dateISO).at(tIndex).startTime = dayStart.toISOString()
+        }),
+
+        setTaskEndTime: (dateISO: string, task: Task, time: string) => set((prev) => {
+          const dateTasks = prev.tasks.get(dateISO)
+          if (!dateTasks) return
+          const tIndex = dateTasks.findIndex((t) => t.id == task.id)
+          if (tIndex == -1) return;
+          const newMap = new Map(prev.tasks);
+          const dayStart = new Date(dateISO);
+          const hourMin = time.split(":");
+          dayStart.setHours(Number(hourMin[0]))
+          dayStart.setMinutes(Number(hourMin[1]))
+          newMap.get(dateISO).at(tIndex).endTime = dayStart.toISOString()
+        }),
+
+        toggleTodo: (dateISO: string, task: Task) => set((prev) => {
+          const dateTasks = prev.tasks.get(dateISO)
+          const tIndex = dateTasks?.findIndex((t) => t.id == task.id)
+          console.log(tIndex, task.id)
+          const newMap = new Map(prev.tasks);
+          if (tIndex != -1) {
+            const completion = !newMap.get(dateISO).at(tIndex).completed
+            if (completion) {
+              newMap.get(dateISO).at(tIndex).completedOn = new Date().toISOString()
             }
-          }),
-        toggleSubTodo: (dateISO: string, task: Task, subtask: SubTask) =>
-          set((prev) => {
-            const dateTasks = prev.tasks.get(dateISO)
-            const tIndex = dateTasks?.findIndex((t) => t.id == task.id)
-            const newMap = new Map(prev.tasks);
-            if (tIndex != -1) {
-              const sIndex = dateTasks?.at(tIndex)?.subtasks.findIndex((s) => s.id == subtask.id)
-              if (sIndex != -1) {
-                newMap.get(dateISO).at(tIndex).subtasks.at(sIndex).completed = !newMap.get(dateISO).at(tIndex).subtasks.at(sIndex).completed
-              }
+            else {
+              newMap.get(dateISO).at(tIndex).completedOn = null
             }
-          }),
+            newMap.get(dateISO).at(tIndex).completed = !newMap.get(dateISO).at(tIndex).completed
+          }
+        }),
+
+        toggleSubTodo: (dateISO: string, task: Task, subtask: SubTask) => set((prev) => {
+          const dateTasks = prev.tasks.get(dateISO)
+          const tIndex = dateTasks?.findIndex((t) => t.id == task.id)
+          const newMap = new Map(prev.tasks);
+          if (tIndex != -1) {
+            const sIndex = dateTasks?.at(tIndex)?.subtasks.findIndex((s) => s.id == subtask.id)
+            if (sIndex != -1) {
+              newMap.get(dateISO).at(tIndex).subtasks.at(sIndex).completed = !newMap.get(dateISO).at(tIndex).subtasks.at(sIndex).completed
+            }
+          }
+        }),
       }),
       {
         name: 'task-storage',

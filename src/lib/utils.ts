@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Task } from "@/store/store"
+import { Task, TaskStore, DateStore } from "@/store/store"
+import { TimeSlot } from "@/components/TimelineView"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -34,6 +35,9 @@ export function orderTasksByTime(unsortedTasks: Task[]) {
     unsortedTasks: new Array<Task>(),
     timeSlots: new Array<TimeSlot>()
   };
+
+  const setTaskOrder = TaskStore((state) => state.setTaskOrder)
+  const currentDate = DateStore((state) => state.currentDate)
 
   if (!unsortedTasks) return sortedTasks;
 
@@ -79,10 +83,13 @@ export function orderTasksByTime(unsortedTasks: Task[]) {
       sortedTasks.timeSlots.push(newTimeSlot)
     } else {
       // If task has a end time the slot it in the latest time slot that is available
+      if (!task.order) {
+        setTaskOrder(currentDate, task, i);
+      }
       sortedTasks.unsortedTasks.push(task)
+      sortedTasks.unsortedTasks = sortedTasks.unsortedTasks.sort((t1, t2) => { return t1.order - t2.order })
+      console.log(sortedTasks.unsortedTasks)
     }
-
-    // else create a time slot with that task from the start of the day to the tasks's end time
 
   }
 

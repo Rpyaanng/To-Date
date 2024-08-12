@@ -1,9 +1,9 @@
 
-import { useEffect } from "react";
 import { Task } from "../store/store"
 import { TaskStore, DateStore } from "@/store/store"
 import { TaskComponent } from "./TaskComponent";
 import { DateToTimeDisplay } from "@/lib/utils";
+import { useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -18,7 +18,7 @@ import {
   sortableKeyboardCoordinates
 } from "@dnd-kit/sortable";
 
-interface TimeSlot {
+export interface TimeSlot {
   startTime: string,
   endTime: string,
   tasks: Task[]
@@ -37,6 +37,10 @@ interface Props {
 
 export function TimeLineView({ unsortedTasks, timeSlots }: TimeLineData) {
 
+  const setTaskOrder = TaskStore((state) => state.setTaskOrder)
+  const currentDate = DateStore((state) => state.currentDate);
+
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -44,18 +48,34 @@ export function TimeLineView({ unsortedTasks, timeSlots }: TimeLineData) {
     })
   );
 
+  const [unsorted, setUnsorted] = useState(unsortedTasks)
+
   return (
     <DndContext
       sensors={sensors}
+      onDragEnd={({ active, over }) => {
+        if (over && active.id !== over?.id) {
+          const activeIndex = unsortedTasks.findIndex(({ id }) => id === active.id);
+          const overIndex = unsortedTasks.findIndex(({ id }) => id === over.id);
+
+          const activeOrder = unsortedTasks.at(activeIndex).order;
+          const overOrder = unsortedTasks.at(overIndex).order
+          //
+          //setTaskOrder(currentDate, unsortedTasks.at(activeIndex), overOrder)
+          //setTaskOrder(currentDate, unsortedTasks.at(overIndex), activeOrder)
+          setUnsorted(arrayMove(unsortedTasks, activeOrder, overOrder))
+        }
+      }}
     >
       <div className="w-full">
         <h2 className="text-l font-bold">Unsorted</h2>
         <div  >
-          <SortableContext items={unsortedTasks}>
+          <SortableContext items={unsorted}>
             <ul className="flex flex-col gap-2 border-b pb-2" role="application">
-              {unsortedTasks.map((task) => {
-                return <TaskComponent task={task} />
-              })}
+              {
+                unsorted.map((task) => {
+                  return <TaskComponent key={"ut_" + task.id} task={task} />
+                })}
             </ul>
           </SortableContext>
         </div>
@@ -76,7 +96,7 @@ export function TimeLineView({ unsortedTasks, timeSlots }: TimeLineData) {
                       {timeslot.tasks.map((task, y) => {
                         return (
                           <div>
-                            <TaskComponent key={"vt_" + y} task={task} />
+                            <TaskComponent key={"vt_" + task.id} task={task} />
                           </div>
                         )
                       })}

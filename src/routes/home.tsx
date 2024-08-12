@@ -14,6 +14,7 @@ import { TaskStore, DateStore, Task, SubTask } from "@/store/store"
 import { ChevronRight, ChevronLeft, PlusIcon } from 'lucide-react'
 import { TimeLineView } from '@/components/TimelineView'
 import { orderTasksByTime } from "@/lib/utils";
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/home')({
   component: Home,
@@ -41,6 +42,8 @@ function Home() {
   }
 
   const orderedTasks = orderTasksByTime(tasks.get(currentDate));
+
+  useEffect(() => console.log(tasks))
 
   return (
     <div className="h-screen">
